@@ -69,10 +69,8 @@ impl<T, let MaxLen: u32> OptimizedBoundedVec<T, MaxLen> {
         let new_len = self.len + append_len;
         assert(new_len <= MaxLen, "extend_from_bounded_vec out of bounds");
 
-        let mut exceeded_len = false;
         for i in 0..Len {
-            exceeded_len |= i == append_len;
-            if !exceeded_len {
+            if i < append_len {
                 self.storage[self.len + i] = vec.get_unchecked(i);
             }
         }

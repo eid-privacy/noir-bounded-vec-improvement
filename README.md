@@ -22,13 +22,31 @@ There's two simulations here
 ```
 
 ### Current Results:
-Original ACIR opcodes: 85868  
-Optimized ACIR opcodes: xxx
+
+#### On input limited to 445 bytes
+Original ACIR opcodes: 19652  
+Optimized ACIR opcodes: 19060
 
 | Metric | Original | Optimized |
 |--------|----------|-----------|
-| nargo_build | 7.717 |  |
-| nargo_execute | 0.369 |  |
-| bb_write_vk | 1.577 |  |
-| bb_prove | 0.060 |  |
-| bb_verify | 0.023 |  |
+| nargo_build | 0.856 | 0.779 |
+| nargo_execute | 0.153 | 0.149 |
+| bb_write_vk | 0.735 | 0.557 |
+| bb_prove | 0.031 | 0.029 |
+| bb_verify | 0.024 | 0.023 |
+
+
+#### On input limited to 2000 bytes
+Original ACIR opcodes: 85868  
+Optimized ACIR opcodes: 83203
+
+| Metric | Original | Optimized |
+|--------|----------|-----------|
+| nargo_build | 7.682 | 7.817 |
+| nargo_execute | 0.363 | 0.385 |
+| bb_write_vk | 1.554 | 1.435 |
+| bb_prove | 0.062 | 0.065 |
+| bb_verify | 0.023 | 0.023 |
+
+It's important to note that timings were averaged over 20 runs. 
+However, since the numbers are so close, it might give wrong conclusions because of fine measurement errors.
