@@ -22,3 +22,13 @@ There's two simulations here
 ```
 
 ### Current Results:
+Original ACIR opcodes: 85868  
+Optimized ACIR opcodes: xxx
+
+| Metric | Original | Optimized |
+|--------|----------|-----------|
+| nargo_build | 7.717 |  |
+| nargo_execute | 0.369 |  |
+| bb_write_vk | 1.577 |  |
+| bb_prove | 0.060 |  |
+| bb_verify | 0.023 |  |
