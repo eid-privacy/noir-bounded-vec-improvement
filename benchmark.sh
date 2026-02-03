@@ -55,10 +55,21 @@ run_benchmark() {
         return 1
     }
     
+    # Artifact names come from package name in Nargo.toml
+    local package_name
+    package_name=$(grep -E '^name\s*=' Nargo.toml | head -1 | sed 's/.*"\([^"]*\)".*/\1/')
+    if [[ -z "$package_name" ]]; then
+        echo "❌ ERROR: Could not read package name from Nargo.toml"
+        return 1
+    fi
+    local circuit_json="$TARGET_DIR/${package_name}.json"
+    local witness_gz="$TARGET_DIR/${package_name}.gz"
+    
     echo ""
     echo "=========================================="
     echo "  Benchmarking: $label"
     echo "  Directory: $project_dir"
+    echo "  Package: $package_name"
     echo "  Runs: $NUM_RUNS"
     echo "=========================================="
     echo ""
@@ -105,7 +116,7 @@ run_benchmark() {
         printf "execute "
         
         # Write VK
-        local write_vk_time=$(run_and_time "bb write_vk -b target/boundedVecOptimized.json -o target")
+        local write_vk_time=$(run_and_time "bb write_vk -b $circuit_json -o $TARGET_DIR")
         if [[ "$write_vk_time" == "error" || "$write_vk_time" == "OOM error" ]]; then
             echo "❌ write_vk failed"
             continue
@@ -113,7 +124,7 @@ run_benchmark() {
         printf "write_vk "
         
         # Prove
-        local prove_time=$(run_and_time "bb prove -b target/boundedVecOptimized.json -w target/boundedVecOptimized.gz -k target/vk -o target")
+        local prove_time=$(run_and_time "bb prove -b $circuit_json -w $witness_gz -k $TARGET_DIR/vk -o $TARGET_DIR")
         if [[ "$prove_time" == "error" || "$prove_time" == "OOM error" ]]; then
             echo "❌ prove failed"
             continue
@@ -121,7 +132,7 @@ run_benchmark() {
         printf "prove "
         
         # Verify
-        local verify_time=$(run_and_time "bb verify -k target/vk -p target/proof")
+        local verify_time=$(run_and_time "bb verify -k $TARGET_DIR/vk -p $TARGET_DIR/proof")
         if [[ "$verify_time" == "error" || "$verify_time" == "OOM error" ]]; then
             echo "❌ verify failed"
             continue
@@ -186,7 +197,7 @@ echo "## Benchmark Results (Average of $NUM_RUNS runs)"
 echo ""
 echo "| Metric | Original | Optimized |"
 echo "|--------|----------|-----------|"
-echo "| nargo_build | ${original_build_time:-error} | ${optimized_build_time:-error} |"
+echo "| nargo_compile | ${original_build_time:-error} | ${optimized_build_time:-error} |"
 echo "| nargo_execute | ${original_execute_time:-error} | ${optimized_execute_time:-error} |"
 echo "| bb_write_vk | ${original_write_vk_time:-error} | ${optimized_write_vk_time:-error} |"
 echo "| bb_prove | ${original_prove_time:-error} | ${optimized_prove_time:-error} |"
